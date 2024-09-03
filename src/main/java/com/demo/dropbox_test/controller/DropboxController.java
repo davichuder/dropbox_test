@@ -61,7 +61,7 @@ public class DropboxController {
     }
 
     @GetMapping("/temporary-link")
-    public ResponseEntity<String> previewImage(@RequestParam String path) {
+    public ResponseEntity<String> temporaryLink(@RequestParam String path) {
         try {
             String temporaryLink = dropboxService.getTemporaryLink(path);
             return ResponseEntity.ok(temporaryLink);
@@ -78,6 +78,16 @@ public class DropboxController {
                                 .contentType(MediaType.IMAGE_JPEG)
                                 .body(thumbnail);
         } catch (DbxException | IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/thumbnail-link")
+    public ResponseEntity<String> thumbnailLink(@RequestParam String path) throws IOException {
+        try {
+            String temporaryLink = dropboxService.getThumbnailLink(path);
+            return ResponseEntity.ok(temporaryLink);
+        } catch (DbxException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
