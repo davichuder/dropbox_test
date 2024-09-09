@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Tokens ###
+src/main/resources/tokens/*

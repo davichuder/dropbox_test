@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "dropbox.app_key",
+    "type": "java.lang.String",
+    "description": "App key of dropbox: a.k.a. client_id"
+  },
+  {
+    "name": "dropbox.secret_key",
+    "type": "java.lang.String",
+    "description": "Secret key of dropbox: a.k.a. client_secret"
+  },
+  {
+    "name": "dropbox.redirect_uri",
+    "type": "java.lang.String",
+    "description": " Where to redirect the user after authorization has completed. This must be the exact URI registered in the App Console; even 'localhost' must be listed if it is used for testing. All redirect URIs must be HTTPS except for localhost URIs. A redirect URI is required for the token flow, but optional for the code flow. If the redirect URI is omitted, the code will be presented directly to the user and they will be invited to enter the information in your app."
+  },
+  {
+    "name": "dropbox.session_key",
+    "type": "java.lang.String",
+    "description": "A string for dropbox.session_key"
+  }
+]}
