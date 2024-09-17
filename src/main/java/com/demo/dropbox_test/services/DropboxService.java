@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +52,7 @@ public class DropboxService {
         appInfo = new DbxAppInfo(appKey, secretKey);
         webAuth = new DbxWebAuth(requestConfig, appInfo);
         dropboxToken = jsonService.readToken();
-        if (dropboxToken != null) {
+        if (isValidToken()) {
             dropboxClient = new DbxClientV2(requestConfig, dropboxToken.getAccessToken());
         }
     }
@@ -61,8 +62,20 @@ public class DropboxService {
                 .isAfter(dropboxToken.getAccessTokenExpiredTime());
     }
 
+    public boolean isRefreshTokenExpired(long aditionalTime, TemporalUnit temporalUnit) {
+        return LocalDateTime.now()
+                .plus(aditionalTime, temporalUnit)
+                .isAfter(dropboxToken.getAccessTokenExpiredTime());
+    }
+
     public boolean isAccessTokenExpired() {
         return LocalDateTime.now()
+                .isAfter(dropboxToken.getRefreshTokenExpiredTime());
+    }
+
+    public boolean isAccessTokenExpired(long aditionalTime, TemporalUnit temporalUnit) {
+        return LocalDateTime.now()
+                .plus(aditionalTime, temporalUnit)
                 .isAfter(dropboxToken.getRefreshTokenExpiredTime());
     }
 
