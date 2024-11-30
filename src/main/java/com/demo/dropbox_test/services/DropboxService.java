@@ -1,24 +1,5 @@
 package com.demo.dropbox_test.services;
 
-import com.demo.dropbox_test.utilities.DropboxToken;
-import com.dropbox.core.DbxAppInfo;
-import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.DbxWebAuth;
-import com.dropbox.core.oauth.DbxCredential;
-import com.dropbox.core.oauth.DbxRefreshResult;
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.CreateFolderErrorException;
-import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.FolderMetadata;
-import com.dropbox.core.v2.files.ListFolderResult;
-import com.dropbox.core.v2.files.Metadata;
-import com.dropbox.core.v2.files.ThumbnailFormat;
-import com.dropbox.core.v2.files.ThumbnailSize;
-
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,6 +12,25 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.demo.dropbox_test.utilities.DropboxToken;
+import com.dropbox.core.DbxAppInfo;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.DbxWebAuth;
+import com.dropbox.core.oauth.DbxCredential;
+import com.dropbox.core.oauth.DbxRefreshResult;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.filerequests.FileRequest;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.dropbox.core.v2.files.Metadata;
+import com.dropbox.core.v2.files.ThumbnailFormat;
+import com.dropbox.core.v2.files.ThumbnailSize;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Service
 @Getter
@@ -119,7 +119,7 @@ public class DropboxService {
                 .uploadAndFinish(inputStream);
     }
 
-    public FolderMetadata createFolder(String path) throws CreateFolderErrorException, DbxException {
+    public FolderMetadata createFolder(String path) throws DbxException {
         return dropboxClient.files().createFolderV2(path).getMetadata();
     }
 
@@ -131,6 +131,7 @@ public class DropboxService {
     public String getTemporaryLink(String path) throws DbxException {
         return dropboxClient.files().getTemporaryLink(path).getLink();
     }
+
 
     public byte[] getThumbnail(String path) throws DbxException, IOException {
         ThumbnailSize size = ThumbnailSize.W256H256;
@@ -148,6 +149,16 @@ public class DropboxService {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(thumbnail);
         FileMetadata metadata = uploadFile("/temp/" + filename, inputStream);
         return getTemporaryLink(metadata.getPathLower());
+    }
+
+    public String getFileRequest(String title, String destination){
+        try {
+            FileRequest fileRequest = dropboxClient.fileRequests().create(title, destination);
+            return fileRequest.getUrl();
+        } catch (DbxException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     // Otros métodos para interactuar con Dropbox

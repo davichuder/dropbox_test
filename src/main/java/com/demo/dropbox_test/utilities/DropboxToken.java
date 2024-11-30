@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DropboxToken {
-    private final int durationRefreshToken = 1;
+    private static int durationRefreshToken = 1;
 
     private String accessToken;
     private Long accessTokenExpiredTimeTimestamp;

@@ -10,7 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.demo.dropbox_test.payloads.responses.DropboxAuthValidResponse;
@@ -133,10 +138,22 @@ public class DropboxController {
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("path") String path, @RequestParam("file") MultipartFile file) {
         try {
-            dropboxService.uploadFile(path + "/" + file.getOriginalFilename(), file.getInputStream());
-            return "Archivo subido exitosamente.";
+            String id = dropboxService.uploadFile(path + "/" + file.getOriginalFilename(), file.getInputStream()).getId();
+            return "Archivo subido exitosamente. ID=" + id;
         } catch (Exception e) {
             return "Error al subir el archivo: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/upload-files")
+    public String uploadFiles(@RequestParam("path") String path, @RequestParam("files") List<MultipartFile> files) {
+        try {
+            for (MultipartFile file : files) {
+                dropboxService.uploadFile(path + "/" + file.getOriginalFilename(), file.getInputStream());
+            }
+            return "Archivos subidos exitosamente.";
+        } catch (Exception e) {
+            return "Error al subir los archivos: " + e.getMessage();
         }
     }
 
@@ -182,6 +199,19 @@ public class DropboxController {
         }
     }
 
+    @GetMapping("/thumbnail-id/{id}")
+    public ResponseEntity<byte[]> getThumbnailId(@PathVariable Long id) {
+        try {
+            String path = "/" + id + ".jpg";
+            byte[] thumbnail = dropboxService.getThumbnail(path);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(thumbnail);
+        } catch (DbxException | IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/thumbnail-link")
     public ResponseEntity<String> thumbnailLink(@RequestParam String path) throws IOException {
         try {
@@ -190,6 +220,11 @@ public class DropboxController {
         } catch (DbxException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("file-request")
+    public String fileRequest() {
+        return dropboxService.getFileRequest("perfil.jpg", "/hola");
     }
 
     // Otros endpoints para interactuar con Dropbox

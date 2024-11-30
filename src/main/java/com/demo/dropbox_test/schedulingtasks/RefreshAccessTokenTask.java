@@ -17,8 +17,7 @@ public class RefreshAccessTokenTask {
 
     @Scheduled(fixedRate = additionalTime)
     public void refreshAccessTokenAsk() {
-        if (dropboxService.isAccessTokenExpired(additionalTime, ChronoUnit.MILLIS)
-                || dropboxService.isAccessTokenExpired(additionalTime, ChronoUnit.MILLIS)) {
+        if (dropboxService.isAccessTokenExpired(additionalTime, ChronoUnit.MILLIS)) {
             dropboxService.refreshAccessToken();
         }
     }
